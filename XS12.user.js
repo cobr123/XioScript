@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.128
+// @version        12.0.129
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.128";
+var version = "12.0.129";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -79,10 +79,8 @@ var processingtime = 0;
 var timeinterval = 0;
 var mousedown = false;
 var $tron;
-var XMreload = false;
 var xsup = [];
 var xsupcheck = {};
-var urlUnitlist = "";
 var blackmail = [];
 var companyid = numberfy($(".dashboard a").attr("href").match(/\d+/)[0]);
 var equipfilter = [];
@@ -113,10 +111,11 @@ function map(html, url, page){
     }
 
     var $html = $(html);
+    var $json = html;
     if(page === "unitlist"){
         mapped[url] = {
-            subids : $html.find(".unit-list-2014 td:nth-child(1)").map( function(i, e){ return numberfy($(e).text()); }).get(),
-            type: $html.find(".unit-list-2014 td:nth-child(3)").map( function(i, e){ return $(e).attr("class").split("-")[1]; }).get()
+            subids : Object.entries($json.data).map(function(u){ return numberfy(u[1].id); }),
+            type: Object.entries($json.data).map(function(u){ return u[1].unit_class_kind; })
         }
     }
     else if(page === "sale"){
@@ -5115,18 +5114,9 @@ function XioMaintenance(subids, allowedPolicies){
 
     $("div.metro_header").append(tablestring);
 
-    urlUnitlist = "/"+realm+"/main/company/view/"+companyid+"/unit_list";
-    var filtersetting = $(".u-s").attr("href") || "/"+realm+"/main/common/util/setfiltering/dbunit/unitListWithProduction/class=0/size=0/type=" + $(".unittype").val();
-    xGet("/"+realm+"/main/common/util/setpaging/dbunit/unitListWithProduction/20000", "none", false, function(){
-        xGet("/"+realm+"/main/common/util/setfiltering/dbunit/unitListWithProduction/class=0/type=0", "none", false, function(){
-            xGet(urlUnitlist, "unitlist", false, function(){
-                xGet("/"+realm+"/main/common/util/setpaging/dbunit/unitListWithProduction/400", "none", false, function(){
-                    xGet(filtersetting, "none", false, function(){
-                        further(mapped[urlUnitlist].subids);
-                    });
-                });
-            });
-        })
+    var urlUnitlist = "/api/"+realm+"/main/company/units?id="+companyid+"&pagesize=20000";
+    xGet(urlUnitlist, "unitlist", false, function(){
+        further(mapped[urlUnitlist].subids);
     });
 
     function further(realsubids){
