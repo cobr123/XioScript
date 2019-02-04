@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.127
+// @version        12.0.128
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.127";
+var version = "12.0.128";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -33,7 +33,7 @@ numberfy = function (variable){
     if(String(variable) === 'Не огр.' || String(variable) === 'Unlim.' || String(variable) === 'Не обм.' || String(variable) === 'N’est pas limité' || String(variable) === 'No limitado' || String(variable) === '无限' || String(variable) === 'Nicht beschr.') {
         return Number.POSITIVE_INFINITY;
     } else {
-        return parseFloat(String(variable).replace(/[\s\$\%]/g, "")) || 0;
+        return parseFloat(String(variable).replace(/[\©\s\$\%]/g, "")) || 0;
     }
 };
 function zipAndMin(napArr1, napArr2){
