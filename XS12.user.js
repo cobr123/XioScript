@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.130
+// @version        12.0.131
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.130";
+var version = "12.0.131";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -3069,22 +3069,26 @@ function equipment(type, subid, choice) {
             || choice[1] === 2 && equip.perc >= 1
             || choice[0] === 1 && equip.required > equip.quality
         ) {
+            var sourceType = ["all", "self", "corp"][choice[2]];
+            // ["max 500k", "max 1m", "max 10m", "max 50m", "max 100m", "max 500m", "max 1b", "max 10b", "max 100b", "Any price"]
+            var maxPriceTotal = [500*1000, 1000*1000, 10*1000*1000, 50*1000*1000, 100*1000*1000, 500*1000*1000, 1000*1000*1000, 10*1000*1000*1000, 100*1000*1000*1000, 0][choice[3]];
+            var total_price_isset = (maxPriceTotal > 0) ? 1 : 0;
+            console.log('sourceType = ' + sourceType);
+            console.log('maxPriceTotal = ' + maxPriceTotal);
+            console.log('total_price_isset = ' + total_price_isset);
             getcount++;
             xsup.push([subid, equip.id,
                 (function () {
                     xGet(url, "equipment", true, function () {
                         if (equipfilter.indexOf(mapped[url].filtername) === -1) {
                             equipfilter.push(mapped[url].filtername);
-                            getcount += 3;
                             xGet("/" + realm + "/window/common/util/setpaging/db" + mapped[url].filtername + "/equipmentSupplierListByUnit/40000", "none", false, function () {
-                                !(--getcount - 1) && xsupGo(subid, equip.id);
-                            });
-                            var data = "total_price%5Bfrom%5D=&total_price%5Bto%5D=&quality%5Bfrom%5D=&quality%5Bto%5D=&quantity%5Bisset%5D=1&quantity%5Bfrom%5D=1&total_price%5Bfrom%5D=0&total_price%5Bto%5D=0&total_price_isset=0&quality%5Bfrom%5D=0&quality%5Bto%5D=0&quality_isset=0&quantity_isset=1";
-                            xPost("/" + realm + "/window/common/util/setfiltering/db" + mapped[url].filtername + "/equipmentSupplierListByUnit", data, function () {
-                                !(--getcount - 1) && xsupGo(subid, equip.id);
-                            });
-                            xGet("/" + realm + "/window/common/util/setfiltering/db" + mapped[url].filtername + "/equipmentSupplierListByUnit/supplierType=all", "none", false, function () {
-                                !(--getcount - 1) && xsupGo(subid, equip.id);
+                                xGet("/" + realm + "/window/common/util/setfiltering/db" + mapped[url].filtername + "/equipmentSupplierListByUnit/supplierType="+sourceType, "none", false, function () {
+                                    var data = "total_price%5Bfrom%5D=0&total_price%5Bto%5D="+maxPriceTotal+"&quantity%5Bisset%5D=1&quantity%5Bfrom%5D=1&total_price_isset="+total_price_isset+"&quality%5Bfrom%5D=0&quality%5Bto%5D=0&quality_isset=0";
+                                    xPost("/" + realm + "/window/common/util/setfiltering/db" + mapped[url].filtername + "/equipmentSupplierListByUnit", data, function () {
+                                        xsupGo(subid, equip.id);
+                                    });
+                                });
                             });
                             xsup.push([subid, equip.id, (function () {
                                 xGet(url, "equipment", true, function () {
@@ -3302,6 +3306,10 @@ function equipment(type, subid, choice) {
 
             if (equipWear > 0 && (h < offer.high.length || n < offer.inc.length)) {
                 postMessage("No equipment on the market with a quality higher than required. Could not repair subdivision <a href=" + urlMain + ">" + subid + "</a>");
+            } else if (equipWear > 0) {
+                postMessage("Could not repair subdivision <a href=" + urlMain + ">" + subid + "</a>");
+            } else if (qualEst < qualReq && n === offer.inc.length) {
+                postMessage("Quality lower then required! Could not repair subdivision <a href=" + urlMain + ">" + subid + "</a>");
             }
 
         } else if (choice[0] === 2 && equipWear !== 0) {
@@ -4908,8 +4916,12 @@ var policyJSON = {
     },
     qm: {
         func: equipment,
-        save: [["-", "Required", "Maximal", "Q2.00"], ["Black", "Full", "Perc"]],
-        order: [["-", "Required", "Maximal", "Q2.00"], ["Black", "Full", "Perc"]],
+        save: [["-", "Required", "Maximal", "Q2.00"], ["Black", "Full", "Perc"]
+            , ["Any", "My", "Corp"], ["max 500k", "max 1m", "max 10m", "max 50m", "max 100m", "max 500m", "max 1b", "max 10b", "max 100b", "Any price"]
+        ],
+        order: [["-", "Required", "Maximal", "Q2.00"], ["Black", "Full", "Perc"]
+            , ["Any", "My", "Corp"], ["max 500k", "max 1m", "max 10m", "max 50m", "max 100m", "max 500m", "max 1b", "max 10b", "max 100b", "Any price"]
+        ],
         name: "equip",
         group: "Equipment",
         wait: ["tech", "research"],
@@ -5340,7 +5352,7 @@ function XioMaintenance(subids, allowedPolicies) {
 
     $("div.metro_header").append(tablestring);
 
-    beforeFurther([],1);
+    beforeFurther([], 1);
 
     function beforeFurther(subIdsAcc, pagenum) {
         var urlUnitlist = "/api/" + realm + "/main/company/units?id=" + companyid + "&pagesize=1000&pagenum=" + pagenum;
