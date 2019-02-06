@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.131
+// @version        12.0.132
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.131";
+var version = "12.0.132";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -3071,7 +3071,7 @@ function equipment(type, subid, choice) {
         ) {
             var sourceType = ["all", "self", "corp"][choice[2]];
             // ["max 500k", "max 1m", "max 10m", "max 50m", "max 100m", "max 500m", "max 1b", "max 10b", "max 100b", "Any price"]
-            var maxPriceTotal = [500*1000, 1000*1000, 10*1000*1000, 50*1000*1000, 100*1000*1000, 500*1000*1000, 1000*1000*1000, 10*1000*1000*1000, 100*1000*1000*1000, 0][choice[3]];
+            var maxPriceTotal = [500 * 1000, 1000 * 1000, 10 * 1000 * 1000, 50 * 1000 * 1000, 100 * 1000 * 1000, 500 * 1000 * 1000, 1000 * 1000 * 1000, 10 * 1000 * 1000 * 1000, 100 * 1000 * 1000 * 1000, 0][choice[3]];
             var total_price_isset = (maxPriceTotal > 0) ? 1 : 0;
             console.log('sourceType = ' + sourceType);
             console.log('maxPriceTotal = ' + maxPriceTotal);
@@ -3083,8 +3083,8 @@ function equipment(type, subid, choice) {
                         if (equipfilter.indexOf(mapped[url].filtername) === -1) {
                             equipfilter.push(mapped[url].filtername);
                             xGet("/" + realm + "/window/common/util/setpaging/db" + mapped[url].filtername + "/equipmentSupplierListByUnit/40000", "none", false, function () {
-                                xGet("/" + realm + "/window/common/util/setfiltering/db" + mapped[url].filtername + "/equipmentSupplierListByUnit/supplierType="+sourceType, "none", false, function () {
-                                    var data = "total_price%5Bfrom%5D=0&total_price%5Bto%5D="+maxPriceTotal+"&quantity%5Bisset%5D=1&quantity%5Bfrom%5D=1&total_price_isset="+total_price_isset+"&quality%5Bfrom%5D=0&quality%5Bto%5D=0&quality_isset=0";
+                                xGet("/" + realm + "/window/common/util/setfiltering/db" + mapped[url].filtername + "/equipmentSupplierListByUnit/supplierType=" + sourceType, "none", false, function () {
+                                    var data = "total_price%5Bfrom%5D=0&total_price%5Bto%5D=" + maxPriceTotal + "&quantity%5Bisset%5D=1&quantity%5Bfrom%5D=1&total_price_isset=" + total_price_isset + "&quality%5Bfrom%5D=0&quality%5Bto%5D=0&quality_isset=0";
                                     xPost("/" + realm + "/window/common/util/setfiltering/db" + mapped[url].filtername + "/equipmentSupplierListByUnit", data, function () {
                                         xsupGo(subid, equip.id);
                                     });
@@ -5352,14 +5352,16 @@ function XioMaintenance(subids, allowedPolicies) {
 
     $("div.metro_header").append(tablestring);
 
-    beforeFurther([], 1);
+    //for list refresh after buying unit
+    var page_size = Math.round(new Date() / 1000);
+    beforeFurther([], 1, page_size);
 
-    function beforeFurther(subIdsAcc, pagenum) {
-        var urlUnitlist = "/api/" + realm + "/main/company/units?id=" + companyid + "&pagesize=1000&pagenum=" + pagenum;
+    function beforeFurther(subIdsAcc, pagenum, pagesize) {
+        var urlUnitlist = "/api/" + realm + "/main/company/units?id=" + companyid + "&pagesize=" + pagesize + "&pagenum=" + pagenum;
         xGet(urlUnitlist, "unitlist", false, function () {
             subIdsAcc = subIdsAcc.concat(mapped[urlUnitlist].subids);
             if (mapped[urlUnitlist].countTotal > subIdsAcc.length) {
-                beforeFurther(subIdsAcc, pagenum + 1);
+                beforeFurther(subIdsAcc, pagenum + 1, pagesize);
             } else {
                 further(subIdsAcc);
             }
