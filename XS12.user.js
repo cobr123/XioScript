@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.133
+// @version        12.0.134
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.133";
+var version = "12.0.134";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -3406,9 +3406,15 @@ function equipment(type, subid, choice) {
             }
 
             if (equipWear > 0 && l + m < offer.low.length + offer.mid.length) {
-                postMessage("No equipment on the market with a quality lower than the maximum quality defined by the Top1. Could not repair subdivision <a href=" + urlMain + ">" + subid + "</a>");
+                //if cant repair to max then repair to required
+                choice[0] = 1;
+                post();
+                return;
             } else if (equipWear > 0 && m + h < offer.mid.length + offer.high.length) {
-                postMessage("No equipment on the market with a quality higher than the current quality. Could not repair subdivision <a href=" + urlMain + ">" + subid + "</a>");
+                //if cant repair to max then repair to required
+                choice[0] = 1;
+                post();
+                return;
             }
 
         } else if (choice[0] === 3 && equipWear !== 0) {
