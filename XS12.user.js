@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.132
+// @version        12.0.133
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.132";
+var version = "12.0.133";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -3130,10 +3130,6 @@ function equipment(type, subid, choice) {
         // console.log('equip.quality = ' + equip.quality);
         // console.log('equip.type = ' + equip.type);
 
-        if (equip.required < equip.quality * 0.9) {
-            equip.required = equip.quality;
-        }
-
         if (choice[1] === 0) {
             equipWear = equip.black;
         } else if (choice[1] === 1) {
@@ -3184,21 +3180,21 @@ function equipment(type, subid, choice) {
             var h = 0;
             var qualEst = 0;
             var qualNew = qualNow;
-            // console.log('offer.low.length = ' + offer.low.length);
-            // console.log('offer.high.length = ' + offer.high.length);
+             // console.log('offer.low.length = ' + offer.low.length);
+             // console.log('offer.high.length = ' + offer.high.length);
 
-            while (equipWear > 0 && h < offer.high.length) {
+            while (equipWear > 0 && (h < offer.high.length || l < offer.low.length)) {
                 // console.log('l = ' + l);
                 // console.log('h = ' + h);
 
                 if (offer.low[l] && offer.low[l].length > l && offer.low[l].available - offer.low[l].buy === 0) {
                     l++;
-                    // console.log('continue l');
+                     // console.log('continue l');
                     continue;
                 }
                 if (offer.high[h] && offer.high[h].length > h && offer.high[h].available - offer.high[h].buy === 0) {
                     h++;
-                    // console.log('continue h');
+                     // console.log('continue h');
                     continue;
                 }
 
@@ -3216,10 +3212,14 @@ function equipment(type, subid, choice) {
                 }
                 l < offer.low.length && offer.low[l].buy--;
 
-                if (l < offer.low.length && qualEst > qualReq && offer.low[l].PQR < offer.high[h].PQR) {
+                // console.log('qualEst = '+qualEst);
+                // console.log('qualEst > qualReq = '+(qualEst > qualReq));
+                if (l < offer.low.length && qualEst > qualReq && (h >= offer.high.length || offer.low[l].PQR < offer.high[h].PQR)) {
                     offer.low[l].buy++;
-                } else {
+                    // console.log('offer.low[l].buy++');
+                } else if (h < offer.high.length) {
                     offer.high[h].buy++;
+                    // console.log('offer.high[h].buy++');
                 }
 
                 equipWear--;
