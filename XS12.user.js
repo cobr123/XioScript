@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.134
+// @version        12.0.135
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.134";
+var version = "12.0.135";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -349,7 +349,7 @@ function map(html, url, page) {
                 return numberfy($(e).text().split("[")[1]);
             }).get(),
             report: $html.find(".grid a:has(img):not(:has(img[alt]))").map(function (i, e) {
-                return $(e).attr("href");
+                return $(e).attr("href").replace("/"+ realm +"/main/globalreport/marketing/","/api/"+ realm +"/main/marketing/report/retail/metrics");
             }).get(),
             img: $html.find(".grid a img:not([alt])").map(function (i, e) {
                 return $(e).attr("src");
@@ -453,11 +453,11 @@ function map(html, url, page) {
         }
     } else if (page === "retailreport") {
         mapped[url] = {
-            marketsize: numberfy($html.find("b:eq(1)").text()),
-            localprice: numberfy($html.find(".grid .even td:eq(0)").text()),
-            localquality: numberfy($html.find(".grid .odd td:eq(0)").text()),
-            cityprice: numberfy($html.find(".grid .even td:eq(1)").text()),
-            cityquality: numberfy($html.find(".grid .odd td:eq(1)").text())
+            marketsize: numberfy($json.local_market_size),
+            localprice: numberfy($json.local_price),
+            localquality: numberfy($json.local_quality),
+            cityprice: numberfy($json.avg_price),
+            cityquality: numberfy($json.avg_quality)
         }
     } else if (page === "pricehistory") {
         mapped[url] = {
