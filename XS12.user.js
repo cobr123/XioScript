@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.137
+// @version        12.0.138
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.137";
+var version = "12.0.138";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -154,7 +154,7 @@ function map(html, url, page) {
             productID: $html.find(".grid a:not([onclick])").map(function (i, e) {
                 return numberfy($(e).attr("href").match(/\d+/)[0]);
             }).get(),
-            region: $html.find(".officePlace a:eq(-2)").text(),
+            region: $html.find(".title a:eq(-1)").text(),
             contractpage: !!$html.find(".tabsub").length,
             tarif_link: $html.find("a.list_sublink[href*=tariff]").attr('href'),
             newServicePrice: $html.find("input[name='servicePrice']").map(function (i, e) {
@@ -494,23 +494,23 @@ function map(html, url, page) {
         }
     } else if (page === "transport") {
         mapped[url] = {
-            countryName: $html.find("select:eq(0) option").map(function (i, e) {
-                return $(e).text();
+            countryName: $html.find("select:eq(1) option.country").map(function (i, e) {
+                return $(e).text().replace(/^\s+|\s+$/g, '');
             }).get(),
-            countryId: $html.find("select:eq(0) option").map(function (i, e) {
+            countryId: $html.find("select:eq(1) option.country").map(function (i, e) {
+                return numberfy($(e).val().split("/")[0]);
+            }).get(),
+            regionName: $html.find("select:eq(1) option.region").map(function (i, e) {
+                return $(e).text().replace(/^\s+|\s+$/g, '');
+            }).get(),
+            regionId: $html.find("select:eq(1) option.region").map(function (i, e) {
                 return numberfy($(e).val().split("/")[1]);
             }).get(),
-            regionName: $html.find("select:eq(1) option").map(function (i, e) {
-                return $(e).text();
+            cityName: $html.find("select:eq(1) option.city").map(function (i, e) {
+                return $(e).text().replace(/^\s+|\s+$/g, '');
             }).get(),
-            regionId: $html.find("select:eq(1) option").map(function (i, e) {
+            cityId: $html.find("select:eq(1) option.city").map(function (i, e) {
                 return numberfy($(e).val().split("/")[2]);
-            }).get(),
-            cityName: $html.find("select:eq(2) option").map(function (i, e) {
-                return $(e).text();
-            }).get(),
-            cityId: $html.find("select:eq(2) option").map(function (i, e) {
-                return numberfy($(e).val().split("/")[3]);
             }).get()
         }
     } else if (page === "CTIE") {
