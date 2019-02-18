@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.136
+// @version        12.0.137
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.136";
+var version = "12.0.137";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -1845,20 +1845,15 @@ function retailPrice(type, subid, choice) {
     function phase() {
         $("[id='x" + "Price" + "current']").html('<a href="/' + realm + '/main/unit/view/' + subid + '">' + subid + '</a>');
 
-        if (choice[0] === 2 || choice[0] === 3 || choice[0] === 4 || choice[0] === 7 || choice[0] === 8) {
+        if (choice[0] === 2 || choice[0] === 3 || choice[0] === 4 || choice[0] === 5 || choice[0] === 7 || choice[0] === 8) {
 
-            var getcount = mapped[url].history.length;
+            var getcount = mapped[url].history.length + mapped[url].report.length;
 
             for (var i = 0; i < mapped[url].history.length; i++) {
                 xGet(mapped[url].history[i], "pricehistory", false, function () {
                     !--getcount && post();
                 });
             }
-
-        } else if (choice[0] === 5) {
-
-            var getcount = mapped[url].report.length;
-
             for (var i = 0; i < mapped[url].report.length; i++) {
                 xGet(mapped[url].report[i], "retailreport", false, function () {
                     !--getcount && post();
@@ -1887,8 +1882,13 @@ function retailPrice(type, subid, choice) {
                 var priceOld = mapped[mapped[url].history[i]].price[0];
                 var share = mapped[url].share[i];
                 var emptystock = mapped[url].deliver[i] === mapped[url].stock[i];
+                var urlReport = mapped[url].report[i];
+                var localPrice = mapped[urlReport].localprice;
+                var localQuality = mapped[urlReport].localquality;
+                var myQuality = mapped[url].quality[i];
+                var priceDef = calcBaseRetailPrice2(myQuality, localPrice, localQuality);
 
-                price = priceOld || 0;
+                price = priceOld || priceDef || 0;
                 if(emptystock) {
                     price = price * 1.03;
                 } else {
@@ -5931,6 +5931,17 @@ function calcOverflowTop3(employees, qualification, techLevel, factor1, manager)
 // расчет стартовой цены продажи в маге исходя из цены и кача местных магов
 function calcBaseRetailPrice(myQuality, localPrice, localQuality) {
     return Math.max(localPrice * (1 + Math.log(myQuality / localQuality)), 0);
+}
+function calcBaseRetailPrice2(myQuality, localPrice, localQuality) {
+    if(myQuality - 30 > localQuality) {
+        return 2.5 * localPrice;
+    } else if(myQuality - 20 > localQuality) {
+        return 2 * localPrice;
+    } else if(myQuality - 10 > localQuality) {
+        return 1.5 * localPrice;
+    } else {
+        return localPrice;
+    }
 }
 
 function topManagerStats() {
