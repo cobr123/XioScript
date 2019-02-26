@@ -606,10 +606,10 @@ function map(html, url, page) {
         }
     } else if (page === "tech") {
         mapped[url] = {
-            price: $html.find("tr td.nowrap:nth-child(2)").map(function (i, e) {
+            price: $html.find("tr > td:nth-child(4)").map(function (i, e) {
                 return $(e).text().trim();
             }).get(),
-            tech: $html.find("tr:has([src='/img/v.gif'])").index(),
+            tech: $html.find("tr.current_row").index(),
             img: getUnitImage(html)
         }
     } else if (page === "products") {
@@ -3525,9 +3525,10 @@ function technology(type, subid, choice) {
             var newTech = 0;
 
             for (var i = mapped[url].price.length - 1; i >= 0; i--) {
-                if (mapped[url].price[i] === "$0.00" && (i + 1) <= techLevel && (i + 1) > mapped[url].tech && mapped[url].tech > 0) {
+                if (mapped[url].price[i] === "" && (i + 1) <= techLevel && (i + 1) > mapped[url].tech && mapped[url].tech > 0) {
                     newTech = i + 1;
                     change = true;
+                    postMessage("Tech lvl for subdivision <a href=" + url + ">" + subid + "</a> is changed to " + newTech);
                     break;
                 }
             }
