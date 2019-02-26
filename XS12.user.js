@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.139
+// @version        12.0.140
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.139";
+var version = "12.0.140";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -609,7 +609,10 @@ function map(html, url, page) {
             price: $html.find("tr > td:nth-child(4)").map(function (i, e) {
                 return $(e).text().trim();
             }).get(),
-            tech: $html.find("tr.current_row").index(),
+            lvltobuy: $html.find("tr > td:nth-child(4)").map(function (i, e) {
+                return parseFloat(($(e).parent().attr('id') || '0').replace('techLevel',''));
+            }).get(),
+            currentlvl: $html.find("tr.current_row").index(),
             img: getUnitImage(html)
         }
     } else if (page === "products") {
@@ -3525,8 +3528,8 @@ function technology(type, subid, choice) {
             var newTech = 0;
 
             for (var i = mapped[url].price.length - 1; i >= 0; i--) {
-                if (mapped[url].price[i] === "" && (i + 1) <= techLevel && (i + 1) > mapped[url].tech && mapped[url].tech > 0) {
-                    newTech = i + 1;
+                newTech = mapped[url].lvltobuy[i];
+                if (mapped[url].price[i] === "" && newTech <= techLevel && newTech > mapped[url].currentlvl && mapped[url].currentlvl > 0) {
                     change = true;
                     postMessage("Tech lvl for subdivision <a href=" + url + ">" + subid + "</a> is changed to " + newTech);
                     break;
