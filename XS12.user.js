@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.140
+// @version        12.0.141
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.140";
+var version = "12.0.141";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -3188,8 +3188,8 @@ function equipment(type, subid, choice) {
             var h = 0;
             var qualEst = 0;
             var qualNew = qualNow;
-             // console.log('offer.low.length = ' + offer.low.length);
-             // console.log('offer.high.length = ' + offer.high.length);
+            // console.log('offer.low.length = ' + offer.low.length);
+            // console.log('offer.high.length = ' + offer.high.length);
 
             while (equipWear > 0 && (h < offer.high.length || l < offer.low.length)) {
                 // console.log('l = ' + l);
@@ -3197,12 +3197,12 @@ function equipment(type, subid, choice) {
 
                 if (offer.low[l] && offer.low[l].length > l && offer.low[l].available - offer.low[l].buy === 0) {
                     l++;
-                     // console.log('continue l');
+                    // console.log('continue l');
                     continue;
                 }
                 if (offer.high[h] && offer.high[h].length > h && offer.high[h].available - offer.high[h].buy === 0) {
                     h++;
-                     // console.log('continue h');
+                    // console.log('continue h');
                     continue;
                 }
 
@@ -3526,6 +3526,7 @@ function technology(type, subid, choice) {
             var managerQual = mapped[urlManager].base[managerIndex] + mapped[urlManager].bonus[managerIndex];
             var techLevel = calcTechLevel(managerQual);
             var newTech = 0;
+            var advised = false;
 
             for (var i = mapped[url].price.length - 1; i >= 0; i--) {
                 newTech = mapped[url].lvltobuy[i];
@@ -3533,6 +3534,9 @@ function technology(type, subid, choice) {
                     change = true;
                     postMessage("Tech lvl for subdivision <a href=" + url + ">" + subid + "</a> is changed to " + newTech);
                     break;
+                } else if (!advised && numberfy(mapped[url].price[i]) <= newTech * 10000000 && newTech <= techLevel && newTech > mapped[url].currentlvl && mapped[url].currentlvl > 0) {
+                    postMessage("You can buy lvl "+ newTech +" (current "+ mapped[url].currentlvl +") for subdivision <a href=" + url + ">" + subid + "</a>, price: " + mapped[url].price[i]);
+                    advised = true;
                 }
             }
 
