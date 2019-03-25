@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.141
+// @version        12.0.142
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.141";
+var version = "12.0.142";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -5842,10 +5842,13 @@ function XioExport() {
     $("div.metro_header").append("<br class=XioProperty><textarea id=XEarea class=XioProperty style='width: 900px'></textarea>");
 
     var string = "";
+    var patt = new RegExp("x" + realm + "\\d+");
+    var patt2 = new RegExp("supply\\d+" + realm + "\\d+\\w+");
     for (var key in ls) {
-        var patt = new RegExp("x" + realm + "\\d+");
         if (patt.test(key)) {
             string += key.substring(1) + "=" + ls[key] + ",";
+        } else if(patt2.test(key)) {
+            string += key + "=" + ls[key] + ",";
         }
     }
 
@@ -5862,9 +5865,19 @@ function XioImport() {
 
     $("#XioSave").click(function () {
         var string = $("#XIarea").val();
-        string = string.replace(/=/g, "']='").replace(/,/g, "';localStorage['x");
         try {
-            eval("localStorage['x" + string.slice(0, -15));
+            var arr = string.split(',');
+            var patt2 = new RegExp("supply\\d+" + realm + "\\d+\\w+");
+            for(idx in arr) {
+                var parts = arr[idx].split('=');
+                var key = parts[0];
+                var value = parts[1];
+                if (patt2.test(key)) {
+                    ls[key] = value;
+                } else {
+                    ls['x' + key] = value;
+                }
+            }
             document.location.reload();
         } catch (e) {
             console.log("import not successful");
