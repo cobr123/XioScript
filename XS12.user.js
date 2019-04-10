@@ -2,7 +2,7 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.142
+// @version        12.0.143
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
@@ -2425,7 +2425,7 @@ function salary(type, subid, choice) {
         });
     }
 
-    //choice[1]: ["min 80% max 500%", "max 500%", "min 80%", "No bound"]
+    //choice[1]: ["min 80% max 500%", "max 500%", "min 80%", "No bound", "min 100%"]
     function post() {
         $("[id='x" + "Salary" + "current']").html('<a href="/' + realm + '/main/unit/view/' + subid + '">' + subid + '</a>');
         var change = false;
@@ -2433,12 +2433,15 @@ function salary(type, subid, choice) {
         if (mapped[url].salaryNow === 0) {
             change = true;
             mapped[url].form.find("#salary").val(mapped[url].salaryCity);
-        } else if (choice[0] === 1 && (mapped[url].skillNow !== mapped[url].skillReq || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8))) {
+        } else if (choice[0] === 1 && (mapped[url].skillNow !== mapped[url].skillReq || (choice[1] === 4 && mapped[url].salaryNow < (mapped[url].salaryCity + .005)) || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8))) {
             //"Required"
             change = true;
             mapped[url].salaryNow = calcSalary(mapped[url].salaryNow, mapped[url].salaryCity, mapped[url].skillNow, mapped[url].skillCity, mapped[url].skillReq);
             if (choice[1] !== 3 && choice[1] !== 1) {
                 mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005) * 0.8);
+            }
+            if (choice[1] === 4) {
+                mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005));
             }
             if (choice[1] !== 3 && choice[1] !== 2) {
                 mapped[url].salaryNow = Math.min(mapped[url].salaryNow, (mapped[url].salaryCity - .005) * 5);
@@ -2451,11 +2454,14 @@ function salary(type, subid, choice) {
             skillReq = Math.floor(skillReq * 100) / 100;
             skillReq = Math.max(skillReq, mapped[url].skillReq);
 
-            if (mapped[url].skillNow !== skillReq || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
+            if (mapped[url].skillNow !== skillReq || (choice[1] === 4 && mapped[url].salaryNow < (mapped[url].salaryCity + .005)) || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
                 change = true;
                 mapped[url].salaryNow = calcSalary(mapped[url].salaryNow, mapped[url].salaryCity, mapped[url].skillNow, mapped[url].skillCity, skillReq);
                 if (choice[1] !== 3 && choice[1] !== 1) {
                     mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005) * 0.8);
+                }
+                if (choice[1] === 4) {
+                    mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005));
                 }
                 if (choice[1] !== 3 && choice[1] !== 2) {
                     mapped[url].salaryNow = Math.min(mapped[url].salaryNow, (mapped[url].salaryCity - .005) * 5);
@@ -2469,11 +2475,14 @@ function salary(type, subid, choice) {
             var skillReq = calcSkill(mapped[url].employees, subType[mapped[urlMain].img][0], mapped[urlManager].base[managerIndex] + mapped[urlManager].bonus[managerIndex]);
             skillReq = Math.floor(skillReq * 100) / 100;
 
-            if (mapped[url].skillNow !== skillReq || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
+            if (mapped[url].skillNow !== skillReq || (choice[1] === 4 && mapped[url].salaryNow < (mapped[url].salaryCity + .005)) || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
                 change = true;
                 mapped[url].salaryNow = calcSalary(mapped[url].salaryNow, mapped[url].salaryCity, mapped[url].skillNow, mapped[url].skillCity, skillReq);
                 if (choice[1] !== 3 && choice[1] !== 1) {
                     mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005) * 0.8);
+                }
+                if (choice[1] === 4) {
+                    mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005));
                 }
                 if (choice[1] !== 3 && choice[1] !== 2) {
                     mapped[url].salaryNow = Math.min(mapped[url].salaryNow, (mapped[url].salaryCity - .005) * 5);
@@ -2489,11 +2498,14 @@ function salary(type, subid, choice) {
             var skillReq = calcSkill(mapped[url].employees, subType[mapped[urlMain].img][0], managerNew);
             skillReq = Math.floor(skillReq * 100) / 100;
 
-            if (mapped[url].skillNow !== skillReq || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
+            if (mapped[url].skillNow !== skillReq || (choice[1] === 4 && mapped[url].salaryNow < (mapped[url].salaryCity + .005)) || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
                 change = true;
                 mapped[url].salaryNow = calcSalary(mapped[url].salaryNow, mapped[url].salaryCity, mapped[url].skillNow, mapped[url].skillCity, skillReq);
                 if (choice[1] !== 3 && choice[1] !== 1) {
                     mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005) * 0.8);
+                }
+                if (choice[1] === 4) {
+                    mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005));
                 }
                 if (choice[1] !== 3 && choice[1] !== 2) {
                     mapped[url].salaryNow = Math.min(mapped[url].salaryNow, (mapped[url].salaryCity - .005) * 5);
@@ -2532,11 +2544,14 @@ function salary(type, subid, choice) {
             skillReq = Math.floor(skillReq * 100) / 100;
             skillReq = Math.max(skillReq, mapped[url].skillReq);
 
-            if (mapped[url].skillNow !== skillReq || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
+            if (mapped[url].skillNow !== skillReq || (choice[1] === 4 && mapped[url].salaryNow < (mapped[url].salaryCity + .005)) || (choice[1] !== 3 && choice[1] !== 2 && mapped[url].salaryNow > (mapped[url].salaryCity - .005) * 5) || (choice[1] !== 3 && choice[1] !== 1 && mapped[url].salaryNow < (mapped[url].salaryCity + .005) * 0.8)) {
                 change = true;
                 mapped[url].salaryNow = calcSalary(mapped[url].salaryNow, mapped[url].salaryCity, mapped[url].skillNow, mapped[url].skillCity, skillReq);
                 if (choice[1] !== 3 && choice[1] !== 1) {
                     mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005) * 0.8);
+                }
+                if (choice[1] === 4) {
+                    mapped[url].salaryNow = Math.max(mapped[url].salaryNow, (mapped[url].salaryCity + .005));
                 }
                 if (choice[1] !== 3 && choice[1] !== 2) {
                     mapped[url].salaryNow = Math.min(mapped[url].salaryNow, (mapped[url].salaryCity - .005) * 5);
@@ -4890,8 +4905,8 @@ var policyJSON = {
     },
     es: {
         func: salary,
-        save: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "139%top1", "130%top1"], ["min 80% max 500%", "max 500%", "min 80%", "No bound"]],
-        order: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "130%top1", "139%top1"], ["min 80% max 500%", "max 500%", "min 80%", "No bound"]],
+        save: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "139%top1", "130%top1"], ["min 80% max 500%", "max 500%", "min 80%", "No bound", "min 100%"]],
+        order: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "130%top1", "139%top1"], ["min 80% max 500%", "max 500%", "min 80%", "min 100%", "No bound"]],
         name: "salaryOldInterface",
         group: "Salary",
         wait: ["equip"],
@@ -4899,8 +4914,8 @@ var policyJSON = {
     },
     en: {
         func: salary,
-        save: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "139%top1", "130%top1"], ["min 80% max 500%", "max 500%", "min 80%", "No bound"]],
-        order: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "130%top1", "139%top1"], ["min 80% max 500%", "max 500%", "min 80%", "No bound"]],
+        save: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "139%top1", "130%top1"], ["min 80% max 500%", "max 500%", "min 80%", "No bound", "min 100%"]],
+        order: [["-", "Required", "Target", "Maximum", "Overflow", "20%top1", "30%top1", "39%top1", "50%top1", "60%top1", "69%top1", "119%top1", "130%top1", "139%top1"], ["min 80% max 500%", "max 500%", "min 80%", "min 100%", "No bound"]],
         name: "salaryNewInterface",
         group: "Salary",
         wait: ["equip"],
