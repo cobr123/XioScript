@@ -5408,7 +5408,7 @@ function XioMaintenance(subids, allowedPolicies) {
         for (var i = 0; i < subids.length; i++) {
             if (realsubids.indexOf(subids[i]) === -1) {
                 var urlSubid = "/" + realm + "/main/unit/view/" + subids[i];
-                postMessage("Subdivision <a href=" + urlSubid + ">" + subids[i] + "</a> is missing from the company. <button onclick='localStorage.removeItem(\"" + "x" + realm + subids[i] + "\");this.remove();'>Click here to erase options of this subdivision from the Local Storage.</button>");
+                postMessage("Subdivision <a href=" + urlSubid + ">" + subids[i] + "</a> seems missing from the company. <button onclick='localStorage.removeItem(\"" + "x" + realm + subids[i] + "\");this.remove();'>Click here to erase options of this subdivision from the Local Storage if it is missing.</button>");
                 continue;
             }
             var savedPolicyStrings = ls["x" + realm + subids[i]] ? ls["x" + realm + subids[i]].split(";") : [];
