@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.144
+// @version        12.0.145
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.144";
+var version = "12.0.145";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -5408,8 +5408,7 @@ function XioMaintenance(subids, allowedPolicies) {
         for (var i = 0; i < subids.length; i++) {
             if (realsubids.indexOf(subids[i]) === -1) {
                 var urlSubid = "/" + realm + "/main/unit/view/" + subids[i];
-                postMessage("Subdivision <a href=" + urlSubid + ">" + subids[i] + "</a> is missing from the company. Options have been erased from the Local Storage.");
-                ls.removeItem("x" + realm + subids[i]);
+                postMessage("Subdivision <a href=" + urlSubid + ">" + subids[i] + "</a> is missing from the company. <button onclick='localStorage.removeItem(\"" + "x" + realm + subids[i] + "\");this.remove();'>Click here to erase options of this subdivision from the Local Storage.</button>");
                 continue;
             }
             var savedPolicyStrings = ls["x" + realm + subids[i]] ? ls["x" + realm + subids[i]].split(";") : [];
