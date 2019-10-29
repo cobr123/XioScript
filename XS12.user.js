@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.147
+// @version        12.0.148
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.147";
+var version = "12.0.148";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -281,13 +281,15 @@ function map(html, url, page) {
     } else if (page === "consume") {
         mapped[url] = {
             consump: zipAndMin(
-                $html.find(".list td:nth-last-child(1) div:nth-child(2)").map(function (i, e) {
-                    return numberfy($(e).text().split(":")[1]);
+                $html.find(".list tr:has(td:nth-child(10)) td:nth-last-child(1)").map(function (i, e) {
+                    return numberfy($('div:nth-child(2)', e).text().split(":")[1]);
                 }).get()
-                , $html.find(".list td:nth-last-child(1) div:nth-child(1)").map(function (i, e) {
-                    return numberfy($(e).text().split(":")[1]);
+                , $html.find(".list tr:has(td:nth-child(10)) td:nth-last-child(1)").map(function (i, e) {
+                    return numberfy($('div:nth-child(1)', e).text().split(":")[1]);
                 }).get()
-            ),
+            ).map(function (value, index) {
+                return value || (numberfy($($html.find(".list tr:has(td:nth-child(10)) td:nth-child(4)")[index]).text()) * 10000);
+            }),
             purch: $html.find('#mainContent > form > table.list > tbody > tr:last > td.nowrap').map(function (i, e) {
                 return numberfy($(e).text());
             }).get()
