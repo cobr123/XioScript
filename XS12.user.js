@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.148
+// @version        12.0.149
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.148";
+var version = "12.0.149";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -2406,7 +2406,7 @@ function storeSupply(type, subid, choice) {
 function salary(type, subid, choice) {
     var url = "/" + realm + "/window/unit/employees/engage/" + subid;
     var urlMain = "/" + realm + "/main/unit/view/" + subid;
-    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge";
+    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var getcount = 0;
 
     if (choice[0] === 1) {
@@ -2723,7 +2723,7 @@ function buyEquipment(type, subid, resultEquipNum, choice) {
     var url = "/" + realm + "/window/unit/equipment/" + subid;
     var urlMain = "/" + realm + "/main/unit/view/" + subid;
     var urlSalary = "/" + realm + "/window/unit/employees/engage/" + subid;
-    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge";
+    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var urlEquipment = "/" + realm + "/main/company/view/" + companyid + "/unit_list/equipment";
     var urlAnimals = "/" + realm + "/main/company/view/" + companyid + "/unit_list/animals";
 
@@ -3034,7 +3034,7 @@ function equipment(type, subid, choice) {
     var url = "/" + realm + "/window/unit/equipment/" + subid;
     var urlMain = "/" + realm + "/main/unit/view/" + subid;
     var urlSalary = "/" + realm + "/window/unit/employees/engage/" + subid;
-    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge";
+    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var urlEquipment = "/" + realm + "/main/company/view/" + companyid + "/unit_list/equipment";
     var urlAnimals = "/" + realm + "/main/company/view/" + companyid + "/unit_list/animals";
 
@@ -3523,7 +3523,7 @@ function equipment(type, subid, choice) {
 
 function technology(type, subid, choice) {
     var url = "/" + realm + "/main/unit/view/" + subid + "/technology";
-    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge";
+    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
 
     var getcount = 2;
     xGet(url, "tech", false, function () {
@@ -3683,7 +3683,7 @@ function research(type, subid, choice) {
     var urlProject = "/" + realm + "/window/unit/view/" + subid + "/project_create";
     var urlUnit = "/" + realm + "/window/unit/view/" + subid + "/set_experemental_unit";
     var urlForecast = "/" + realm + "/ajax/unit/forecast";
-    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge";
+    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var urlSalary = "/" + realm + "/window/unit/employees/engage/" + subid;
     var urlMain = "/" + realm + "/main/unit/view/" + subid;
 
@@ -4486,7 +4486,7 @@ function advertisement(type, subid, choice) {
 
     var url = "/" + realm + "/main/unit/view/" + subid + "/virtasement";
     var urlFame = "/" + realm + "/ajax/unit/virtasement/" + subid + "/fame";
-    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge";
+    var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
 
     var pccost = 0;
     var getcount = 0;
@@ -5982,7 +5982,7 @@ function calcBaseRetailPrice2(myQuality, localPrice, localQuality) {
 }
 
 function topManagerStats() {
-    var url = "/" + realm + "/main/user/privat/persondata/knowledge";
+    var url = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var here = "here";
 
     $.ajax({
