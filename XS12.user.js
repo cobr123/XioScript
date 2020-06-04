@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.149
+// @version        12.0.150
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.149";
+var version = "12.0.150";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -1398,7 +1398,7 @@ function salePrice(type, subid, choice) {
 
 function energyWithSupplyPrice(type, subid, choice) {
 
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlSale = "/" + realm + "/main/unit/view/" + subid + "/sale";
     var urlTariff = "";
 
@@ -1464,7 +1464,7 @@ function energyWithSupplyPrice(type, subid, choice) {
 
 function solarEnergyPrice(type, subid, choice) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid;
+    var url = "/" + realm + "/main/unit/view/" + subid + "?old";
     var url2 = "/" + realm + "/main/unit/view/" + subid + "/sale";
     var url3 = "";
 
@@ -1516,7 +1516,7 @@ function solarEnergyPrice(type, subid, choice) {
 
 function incineratorPrice(type, subid, choice) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid;
+    var url = "/" + realm + "/main/unit/view/" + subid + "?old";
     var url2 = "/" + realm + "/main/unit/view/" + subid + "/sale";
 
     xGet(url, "service", false, function () {
@@ -1561,7 +1561,7 @@ function incineratorPrice(type, subid, choice) {
 
 function serviceWithoutStockPrice(type, subid, choice) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid;
+    var url = "/" + realm + "/main/unit/view/" + subid + "?old";
 
     xGet(url, "service", false, function () {
         phase();
@@ -1641,8 +1641,8 @@ function serviceWithoutStockPrice(type, subid, choice) {
 
 function mobileNetworkOperatorPrice(type, subid, choice) {
 
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
-    var urlSupply = "/" + realm + "/main/unit/view/" + subid + "/supply";
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
+    var urlSupply = "/" + realm + "/main/unit/view/" + subid + "/supply?old";
 
 
     xGet(urlMain, "service", false, function () {
@@ -1739,7 +1739,7 @@ function mobileNetworkOperatorPrice(type, subid, choice) {
 
 function servicePrice(type, subid, choice) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid;
+    var url = "/" + realm + "/main/unit/view/" + subid + "?old";
     var url2 = "/" + realm + "/main/unit/view/" + subid + "/consume";
 
     xGet(url, "service", false, function () {
@@ -2070,8 +2070,8 @@ function salePolicy(type, subid, choice) {
 }
 
 function mobileNetworkOperatorSupply(type, subid, choice) {
-    var urlSupply = "/" + realm + "/main/unit/view/" + subid + "/supply";
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlSupply = "/" + realm + "/main/unit/view/" + subid + "/supply?old";
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlContract = "/" + realm + "/ajax/unit/supply/create";
 
 
@@ -2161,7 +2161,7 @@ function mobileNetworkOperatorSupply(type, subid, choice) {
 }
 
 function prodSupply(type, subid, choice) {
-    var url = "/" + realm + "/main/unit/view/" + subid + "/supply";
+    var url = "/" + realm + "/main/unit/view/" + subid + "/supply?old";
     var url2 = "/" + realm + "/main/unit/view/" + subid + "/consume";
     var urlContract = "/" + realm + "/ajax/unit/supply/create";
 
@@ -2267,7 +2267,7 @@ function prodSupply(type, subid, choice) {
 }
 
 function storeSupply(type, subid, choice) {
-    var url = "/" + realm + "/main/unit/view/" + subid + "/supply";
+    var url = "/" + realm + "/main/unit/view/" + subid + "/supply?old";
     var urlContract = "/" + realm + "/ajax/unit/supply/create";
     var urlTrade = "/" + realm + "/main/unit/view/" + subid + "/trading_hall";
 
@@ -2405,7 +2405,7 @@ function storeSupply(type, subid, choice) {
 
 function salary(type, subid, choice) {
     var url = "/" + realm + "/window/unit/employees/engage/" + subid;
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var getcount = 0;
 
@@ -2574,8 +2574,8 @@ function salary(type, subid, choice) {
 
 function holiday(type, subid, choice) {
 
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
-    var urlSupply = "/" + realm + "/main/unit/view/" + subid + "/supply";
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
+    var urlSupply = "/" + realm + "/main/unit/view/" + subid + "/supply?old";
     var urlTrade = "/" + realm + "/main/unit/view/" + subid + "/trading_hall";
 
     var getcount = 0;
@@ -2721,7 +2721,7 @@ function training(type, subid, choice) {
 function buyEquipment(type, subid, resultEquipNum, choice) {
 
     var url = "/" + realm + "/window/unit/equipment/" + subid;
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlSalary = "/" + realm + "/window/unit/employees/engage/" + subid;
     var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var urlEquipment = "/" + realm + "/main/company/view/" + companyid + "/unit_list/equipment";
@@ -3032,7 +3032,7 @@ function buyEquipment(type, subid, resultEquipNum, choice) {
 function equipment(type, subid, choice) {
 
     var url = "/" + realm + "/window/unit/equipment/" + subid;
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlSalary = "/" + realm + "/window/unit/employees/engage/" + subid;
     var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var urlEquipment = "/" + realm + "/main/company/view/" + companyid + "/unit_list/equipment";
@@ -3573,7 +3573,7 @@ function technology(type, subid, choice) {
 
 function politicAgitation(type, subid, choice) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid;
+    var url = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlFinance = "/" + realm + "/main/unit/view/" + subid + "/finans_report/by_item";
     var urlAjax = "/" + realm + "/ajax/unit/artefact/list/?unit_id=" + subid + "&slot_id=368592";
 
@@ -3616,7 +3616,7 @@ function politicAgitation(type, subid, choice) {
 
 function prodBooster(type, subid, choice) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid;
+    var url = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlFinance = "/" + realm + "/main/unit/view/" + subid + "/finans_report/by_item";
     var urlAjax = "/" + realm + "/ajax/unit/artefact/list/?unit_id=" + subid + "&slot_id=300139";
 
@@ -3685,7 +3685,7 @@ function research(type, subid, choice) {
     var urlForecast = "/" + realm + "/ajax/unit/forecast";
     var urlManager = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var urlSalary = "/" + realm + "/window/unit/employees/engage/" + subid;
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
 
     xGet(urlResearch, "research", false, function () {
         prephase();
@@ -3967,9 +3967,9 @@ function research(type, subid, choice) {
 
 function wareSupply(type, subid, choice, good) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid + "/supply";
+    var url = "/" + realm + "/main/unit/view/" + subid + "/supply?old";
     var urlSale = "/" + realm + "/main/unit/view/" + subid + "/sale";
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlContract = [];
 
     var getcount = 3;
@@ -4556,7 +4556,7 @@ function advertisement(type, subid, choice) {
 
 function unitSizeExtend(type, subid, choice) {
 
-    var urlMain = "/" + realm + "/main/unit/view/" + subid;
+    var urlMain = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlSize = "/" + realm + "/window/unit/upgrade/" + subid;
 
     $("[id='x" + "Size" + "current']").html('<a href="/' + realm + '/main/unit/view/' + subid + '">' + subid + '</a>');
@@ -4591,7 +4591,7 @@ function unitSizeExtend(type, subid, choice) {
 
 function wareSize(type, subid, choice) {
 
-    var url = "/" + realm + "/main/unit/view/" + subid;
+    var url = "/" + realm + "/main/unit/view/" + subid + "?old";
     var urlSize = "/" + realm + "/window/unit/upgrade/" + subid;
 
     xGet(url, "waremain", false, function () {
@@ -5510,7 +5510,7 @@ function XioGenerator(subids) {
         var subid = subids[j];
         data[subid] = [];
 
-        var url = "/" + realm + "/main/unit/view/" + subid;
+        var url = "/" + realm + "/main/unit/view/" + subid + "?old";
 
         getcount++;
         (function (url, subid) {
