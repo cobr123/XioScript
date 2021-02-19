@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.150
+// @version        12.0.151
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.150";
+var version = "12.0.151";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -3679,7 +3679,7 @@ function prodBooster(type, subid, choice) {
 }
 
 function research(type, subid, choice) {
-    var urlResearch = "/" + realm + "/main/unit/view/" + subid + "/investigation";
+    var urlResearch = "/" + realm + "/main/unit/view/" + subid + "/investigation?old";
     var urlProject = "/" + realm + "/window/unit/view/" + subid + "/project_create";
     var urlUnit = "/" + realm + "/window/unit/view/" + subid + "/set_experemental_unit";
     var urlForecast = "/" + realm + "/ajax/unit/forecast";
