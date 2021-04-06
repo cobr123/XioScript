@@ -2,14 +2,14 @@
 // @name           XioScript
 // @namespace      https://github.com/XiozZe/XioScript
 // @description    XioScript with XioMaintenance
-// @version        12.0.151
+// @version        12.0.152
 // @author		   XiozZe
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js
 // @include        http*://*virtonomic*.*/*/*
 // @exclude        http*://virtonomics.wikia.com*
 // ==/UserScript==
 
-var version = "12.0.151";
+var version = "12.0.152";
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 
@@ -899,6 +899,27 @@ function map(html, url, page) {
         }
     }
 }
+let rateLimitMax = 4;
+let rateLimitBuffer = [0];
+function addLastTimeRateLimit(time) {
+    if(rateLimitBuffer.length === rateLimitMax){
+        rateLimitBuffer.shift();
+    }
+    rateLimitBuffer.push(time);
+}
+function withRateLimit(func) {
+    let time = new Date().getTime();
+    if ((time - rateLimitBuffer[0]) / 1000 > 1){
+        addLastTimeRateLimit(time);
+        let reqPerSec = rateLimitBuffer.filter(t => (time - t) / 1000 <= 1).length;
+        func();
+        $("#XioReqPerSec").text(reqPerSec + " req/sec");
+    } else {
+        setTimeout(function () {
+            withRateLimit(func);
+        }, 200);
+    }
+}
 
 function xGet(url, page, force, callback) {
 
@@ -907,38 +928,41 @@ function xGet(url, page, force, callback) {
         if ($.inArray(url, getUrls) === -1) {
             getUrls.push(url);
         }
+        withRateLimit(function(){
+            $.ajax({
+                url: url,
+                type: "GET",
 
-        $.ajax({
-            url: url,
-            type: "GET",
+                success: function (html, status, xhr) {
+                    try {
+                        time();
+                        servergetcount++;
+                        $("#XioGetCalls").text(servergetcount);
+                        $("#XioServerCalls").text(servergetcount + serverpostcount);
+                        map(html, url, page);
+                        callback();
+                        xUrlDone(url);
+                    } catch (e) {
+                        console.error(page + ': ' + location.protocol + '//' + location.host + url);
+                        console.error('regenerate settings for unit may help.');
+                        throw e;
+                    }
+                },
 
-            success: function (html, status, xhr) {
-                try {
+                error: function (xhr, status, error) {
                     time();
                     servergetcount++;
                     $("#XioGetCalls").text(servergetcount);
                     $("#XioServerCalls").text(servergetcount + serverpostcount);
-                    map(html, url, page);
-                    callback();
-                    xUrlDone(url);
-                } catch (e) {
-                    console.error(page + ': ' + location.protocol + '//' + location.host + url);
-                    console.error('regenerate settings for unit may help.');
-                    throw e;
+                    //Resend ajax
+                    var tthis = this;
+                    setTimeout(function () {
+                        withRateLimit(function(){
+                            $.ajax(tthis);
+                        });
+                    }, 3000);
                 }
-            },
-
-            error: function (xhr, status, error) {
-                time();
-                servergetcount++;
-                $("#XioGetCalls").text(servergetcount);
-                $("#XioServerCalls").text(servergetcount + serverpostcount);
-                //Resend ajax
-                var tthis = this;
-                setTimeout(function () {
-                    $.ajax(tthis);
-                }, 3000);
-            }
+            });
         });
     } else {
         xcallback.push([url, function () {
@@ -954,71 +978,78 @@ function xGet(url, page, force, callback) {
 
 function xPost(url, form, callback) {
 
-    $.ajax({
-        url: url,
-        data: form,
-        type: "POST",
+    withRateLimit(function(){
+        $.ajax({
+            url: url,
+            data: form,
+            type: "POST",
 
-        success: function (html, status, xhr) {
-            try {
+            success: function (html, status, xhr) {
+                try {
+                    time();
+                    serverpostcount++;
+                    $("#XioPostCalls").text(serverpostcount);
+                    $("#XioServerCalls").text(servergetcount + serverpostcount);
+                    callback(html);
+                } catch (e) {
+                    console.error(location.protocol + '//' + location.host + url);
+                    throw e;
+                }
+            },
+
+            error: function (xhr, status, error) {
                 time();
                 serverpostcount++;
                 $("#XioPostCalls").text(serverpostcount);
                 $("#XioServerCalls").text(servergetcount + serverpostcount);
-                callback(html);
-            } catch (e) {
-                console.error(location.protocol + '//' + location.host + url);
-                throw e;
+                //Resend ajax
+                var tthis = this;
+                setTimeout(function () {
+                    withRateLimit(function(){
+                        $.ajax(tthis);
+                    });
+                }, 3000);
             }
-        },
-
-        error: function (xhr, status, error) {
-            time();
-            serverpostcount++;
-            $("#XioPostCalls").text(serverpostcount);
-            $("#XioServerCalls").text(servergetcount + serverpostcount);
-            //Resend ajax
-            var tthis = this;
-            setTimeout(function () {
-                $.ajax(tthis);
-            }, 3000);
-        }
+        });
     });
-
 }
 
 function xContract(url, data, callback) {
 
-    $.ajax({
-        url: url,
-        data: data,
-        type: "POST",
-        dataType: "JSON",
+    withRateLimit(function(){
+        $.ajax({
+            url: url,
+            data: data,
+            type: "POST",
+            dataType: "JSON",
 
-        success: function (data, status, xhr) {
-            try {
+            success: function (data, status, xhr) {
+                try {
+                    time();
+                    serverpostcount++;
+                    $("#XioPostCalls").text(serverpostcount);
+                    $("#XioServerCalls").text(servergetcount + serverpostcount);
+                    callback(data);
+                } catch (e) {
+                    console.error(url);
+                    throw e;
+                }
+            },
+
+            error: function (xhr, status, error) {
                 time();
                 serverpostcount++;
                 $("#XioPostCalls").text(serverpostcount);
                 $("#XioServerCalls").text(servergetcount + serverpostcount);
-                callback(data);
-            } catch (e) {
-                console.error(url);
-                throw e;
+                //Resend ajax
+                var tthis = this;
+                setTimeout(function () {
+                    withRateLimit(function(){
+                        $.ajax(tthis);
+                    });
+                }, 3000);
             }
-        },
-
-        error: function (xhr, status, error) {
-            time();
-            serverpostcount++;
-            $("#XioPostCalls").text(serverpostcount);
-            $("#XioServerCalls").text(servergetcount + serverpostcount);
-            //Resend ajax
-            var tthis = this;
-            setTimeout(function () {
-                $.ajax(tthis);
-            }, 3000);
-        }
+        });
     });
 
 }
@@ -5381,6 +5412,9 @@ function XioMaintenance(subids, allowedPolicies) {
         + "<td>sec</td>"
         + "</tr>"
         + "<tr>"
+        + "<td id=XioReqPerSec colspan=4></td>"
+        + "</tr>"
+        + "<tr>"
         + "<td id=xDone colspan=4 style='visibility: hidden; color: lightgoldenrodyellow'>All Done!</td>"
         + "</tr>"
         + "</table>"
@@ -5985,111 +6019,113 @@ function topManagerStats() {
     var url = "/" + realm + "/main/user/privat/persondata/knowledge?old";
     var here = "here";
 
-    $.ajax({
-        url: url,
-        type: "GET",
+    withRateLimit(function(){
+        $.ajax({
+            url: url,
+            type: "GET",
 
-        success: function (html, status, xhr) {
+            success: function (html, status, xhr) {
 
-            map(html, url, "manager");
-            map(document, here, "main");
+                map(html, url, "manager");
+                map(document, here, "main");
 
-            var factor1 = subType[mapped[here].img][0];
-            var factor3 = subType[mapped[here].img][1];
+                var factor1 = subType[mapped[here].img][0];
+                var factor3 = subType[mapped[here].img][1];
 
-            var managerIndex = mapped[url].pic.indexOf(mapped[here].managerPic);
+                var managerIndex = mapped[url].pic.indexOf(mapped[here].managerPic);
 
-            if (managerIndex >= 0) {
-                var managerBase = mapped[url].base[managerIndex];
-                var managerTotal = mapped[here].qual;
-                ov1 = calcOverflowTop1(mapped[here].maxEmployees, factor3, managerTotal);
-                ov3 = calcOverflowTop3(mapped[here].employees, mapped[here].skillNow, mapped[here].techLevel, factor1, managerTotal);
+                if (managerIndex >= 0) {
+                    var managerBase = mapped[url].base[managerIndex];
+                    var managerTotal = mapped[here].qual;
+                    ov1 = calcOverflowTop1(mapped[here].maxEmployees, factor3, managerTotal);
+                    ov3 = calcOverflowTop3(mapped[here].employees, mapped[here].skillNow, mapped[here].techLevel, factor1, managerTotal);
 
-                $(".unit_box:has(.fa-users) tr:not(:has([colspan])):eq(4) td:eq(1)").append(" (current)"
-                    + "<div style='color: darkgreen'>" + (Math.floor(calcSkill(mapped[here].employees, factor1, managerBase) * 100) / 100).toFixed(2) + " (target) </div>"
-                    + "<div style='color: indigo'>" + (Math.floor(calcSkill(mapped[here].employees, factor1, managerTotal) * 100) / 100).toFixed(2) + " (maximum) </div>"
-                    + "<div style='color: crimson'>" + (Math.floor(calcSkill(mapped[here].employees, factor1, managerTotal * ov1) * 100) / 100).toFixed(2) + " (overflow) </div>"
-                );
+                    $(".unit_box:has(.fa-users) tr:not(:has([colspan])):eq(4) td:eq(1)").append(" (current)"
+                        + "<div style='color: darkgreen'>" + (Math.floor(calcSkill(mapped[here].employees, factor1, managerBase) * 100) / 100).toFixed(2) + " (target) </div>"
+                        + "<div style='color: indigo'>" + (Math.floor(calcSkill(mapped[here].employees, factor1, managerTotal) * 100) / 100).toFixed(2) + " (maximum) </div>"
+                        + "<div style='color: crimson'>" + (Math.floor(calcSkill(mapped[here].employees, factor1, managerTotal * ov1) * 100) / 100).toFixed(2) + " (overflow) </div>"
+                    );
 
-                $(".unit_box:has(.fa-users) tr:not(:has([colspan])):eq(1) td:eq(1)").append(" (current)"
-                    + "<div style='color: darkgreen'>" + Math.floor(calcEmployees(mapped[here].skillNow, factor1, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (target) </div>"
-                    + "<div style='color: indigo'>" + Math.floor(calcEmployees(mapped[here].skillNow, factor1, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (maximum) </div>"
-                    + "<div style='color: crimson'>" + Math.floor(calcEmployees(mapped[here].skillNow, factor1, managerTotal * ov1)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (overflow) </div>"
-                );
+                    $(".unit_box:has(.fa-users) tr:not(:has([colspan])):eq(1) td:eq(1)").append(" (current)"
+                        + "<div style='color: darkgreen'>" + Math.floor(calcEmployees(mapped[here].skillNow, factor1, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (target) </div>"
+                        + "<div style='color: indigo'>" + Math.floor(calcEmployees(mapped[here].skillNow, factor1, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (maximum) </div>"
+                        + "<div style='color: crimson'>" + Math.floor(calcEmployees(mapped[here].skillNow, factor1, managerTotal * ov1)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (overflow) </div>"
+                    );
 
-                $(".unit_box:has(.fa-user) tr:not(:has([colspan])):eq(2) td:eq(1)").append(" (current)"
-                    + "<div style='color: darkgreen'>" + Math.floor(calcAllEmployees(factor3, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (target) </div>"
-                    + "<div style='color: indigo'>" + Math.floor(calcAllEmployees(factor3, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (maximum) </div>"
-                    + "<div style='color: crimson'>" + Math.floor(calcAllEmployees(factor3, managerTotal) * ov3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (overflow) </div>"
-                );
+                    $(".unit_box:has(.fa-user) tr:not(:has([colspan])):eq(2) td:eq(1)").append(" (current)"
+                        + "<div style='color: darkgreen'>" + Math.floor(calcAllEmployees(factor3, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (target) </div>"
+                        + "<div style='color: indigo'>" + Math.floor(calcAllEmployees(factor3, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (maximum) </div>"
+                        + "<div style='color: crimson'>" + Math.floor(calcAllEmployees(factor3, managerTotal) * ov3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " (overflow) </div>"
+                    );
 
-                $(".unit_box:has(.fa-cogs) tr:not(:has([colspan])):eq(2) td:eq(1)").append(" (current)"
-                    + "<div style='color: darkgreen'>" + (Math.floor(calcEquip(calcSkill(mapped[here].employees, factor1, managerBase)) * 100) / 100).toFixed(2) + " (target) </div>"
-                    + "<div style='color: indigo'>" + (Math.floor(calcEquip(calcSkill(mapped[here].employees, factor1, managerTotal)) * 100) / 100).toFixed(2) + " (maximum) </div>"
-                    + "<div style='color: crimson'>" + (Math.floor(calcEquip(calcSkill(mapped[here].employees, factor1, managerTotal * ov1)) * 100) / 100).toFixed(2) + " (overflow) </div>"
-                );
+                    $(".unit_box:has(.fa-cogs) tr:not(:has([colspan])):eq(2) td:eq(1)").append(" (current)"
+                        + "<div style='color: darkgreen'>" + (Math.floor(calcEquip(calcSkill(mapped[here].employees, factor1, managerBase)) * 100) / 100).toFixed(2) + " (target) </div>"
+                        + "<div style='color: indigo'>" + (Math.floor(calcEquip(calcSkill(mapped[here].employees, factor1, managerTotal)) * 100) / 100).toFixed(2) + " (maximum) </div>"
+                        + "<div style='color: crimson'>" + (Math.floor(calcEquip(calcSkill(mapped[here].employees, factor1, managerTotal * ov1)) * 100) / 100).toFixed(2) + " (overflow) </div>"
+                    );
 
-                $(".unit_box:has(.fa-industry) tr:not(:has([colspan])):eq(2) td:eq(1)").append(" (current)"
-                    + "<div style='color: darkgreen'>" + Math.floor(calcTechLevel(managerBase)) + " (target) </div>"
-                    + "<div style='color: indigo'>" + Math.floor(calcTechLevel(managerTotal)) + " (maximum) </div>"
-                    + "<div style='color: crimson'>" + Math.floor(calcTechLevel(managerTotal * ov1)) + " (overflow) </div>"
-                );
+                    $(".unit_box:has(.fa-industry) tr:not(:has([colspan])):eq(2) td:eq(1)").append(" (current)"
+                        + "<div style='color: darkgreen'>" + Math.floor(calcTechLevel(managerBase)) + " (target) </div>"
+                        + "<div style='color: indigo'>" + Math.floor(calcTechLevel(managerTotal)) + " (maximum) </div>"
+                        + "<div style='color: crimson'>" + Math.floor(calcTechLevel(managerTotal * ov1)) + " (overflow) </div>"
+                    );
 
-                $(".unit_box:has(.fa-tasks) tr:not(:has([colspan])):eq(7)").after(""
-                    + "<tr style='color: blue'><td>Expected top manager efficiency</td><td>" + calcEfficiency(mapped[here].employees, mapped[here].maxEmployees, managerTotal, factor1, factor3, mapped[here].skillNow, mapped[here].techLevel) + "</td></tr>"
-                );
+                    $(".unit_box:has(.fa-tasks) tr:not(:has([colspan])):eq(7)").after(""
+                        + "<tr style='color: blue'><td>Expected top manager efficiency</td><td>" + calcEfficiency(mapped[here].employees, mapped[here].maxEmployees, managerTotal, factor1, factor3, mapped[here].skillNow, mapped[here].techLevel) + "</td></tr>"
+                    );
 
 
-            } else {
-                managerIndex = mapped[url].pic.indexOf(subType[mapped[here].img][2]);
-                var managerBase = mapped[url].base[managerIndex];
-                var managerTotal = managerBase + mapped[url].bonus[managerIndex];
+                } else {
+                    managerIndex = mapped[url].pic.indexOf(subType[mapped[here].img][2]);
+                    var managerBase = mapped[url].base[managerIndex];
+                    var managerTotal = managerBase + mapped[url].bonus[managerIndex];
 
-                function placeText($place, text, value, color) {
-                    $place.html($place.html() + "<br><span style='color: " + color + "'><b>" + value + "</b>" + text + "</span>");
+                    function placeText($place, text, value, color) {
+                        $place.html($place.html() + "<br><span style='color: " + color + "'><b>" + value + "</b>" + text + "</span>");
+                    }
+
+                    var $qualRow = $("tr:contains('Qualification of employees'), tr:contains('Qualification of scientists'), \n\
+                                  tr:contains('Workers qualification')");
+                    var $levelRow = $("tr:contains('Qualification of player')");
+                    var $empRow = $("tr:contains('Number of employees'), tr:contains('Number of scientists'),\n\
+                                        tr:contains('Number of workers')");
+                    var $totalEmpRow = $("tr:contains('profile qualification')");
+                    var $techRow = $("tr:contains('Technology level'), tr:contains('Current research')");
+                    var $equipRow = $("tr:contains('Equipment quality'), tr:contains('Computers quality'),\n\
+                         tr:contains('Livestock quality'), tr:contains('Quality of agricultural machines')");
+                    var $effiRow = $("tr:contains('Top manager efficiency')");
+
+                    var amount = numberfy($empRow.find("td:eq(1)").text());
+                    var qual = numberfy($qualRow.find("td:eq(1)").text());
+                    var level = numberfy($levelRow.find("td:eq(1)").text());
+                    var totalEmp = numberfy($totalEmpRow.find("td:eq(1)").text());
+                    var tech = numberfy($techRow.find("td:eq(1)").text());
+                    var eqQual = numberfy($equipRow.find("td:eq(1)").text());
+
+                    ov1 = calcOverflowTop1(totalEmp, factor3, managerTotal);
+                    ov3 = calcOverflowTop3(amount, qual, tech, factor1, managerTotal);
+                    console.log(ov1, ov3, mapped[here]);
+
+                    placeText($empRow.find("td:eq(1)"), " (target)", Math.floor(calcEmployees(qual, factor1, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "darkgreen");
+                    placeText($empRow.find("td:eq(1)"), " (maximum)", Math.floor(calcEmployees(qual, factor1, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "indigo");
+                    placeText($empRow.find("td:eq(1)"), " (overflow)", Math.floor(calcEmployees(qual, factor1, managerTotal * ov1)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "crimson");
+                    placeText($qualRow.find("td:eq(1)"), " (target)", (Math.floor(calcSkill(amount, factor1, managerBase) * 100) / 100).toFixed(2), "darkgreen");
+                    placeText($qualRow.find("td:eq(1)"), " (maximum)", (Math.floor(calcSkill(amount, factor1, managerTotal) * 100) / 100).toFixed(2), "indigo");
+                    placeText($qualRow.find("td:eq(1)"), " (overflow)", (Math.floor(calcSkill(amount, factor1, managerTotal * ov1) * 100) / 100).toFixed(2), "crimson");
+                    placeText($totalEmpRow.find("td:eq(1)"), " (target)", Math.floor(calcAllEmployees(factor3, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "darkgreen");
+                    placeText($totalEmpRow.find("td:eq(1)"), " (maximum)", Math.floor(calcAllEmployees(factor3, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "indigo");
+                    placeText($totalEmpRow.find("td:eq(1)"), " (overflow)", Math.floor(calcAllEmployees(factor3, managerTotal) * ov3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "crimson");
+                    placeText($equipRow.find("td:eq(1)"), " (target)", (Math.floor(calcEquip(calcSkill(amount, factor1, managerBase)) * 100) / 100).toFixed(2), "darkgreen");
+                    placeText($equipRow.find("td:eq(1)"), " (maximum)", (Math.floor(calcEquip(calcSkill(amount, factor1, managerTotal)) * 100) / 100).toFixed(2), "indigo");
+                    placeText($equipRow.find("td:eq(1)"), " (overflow)", (Math.floor(calcEquip(calcSkill(amount, factor1, managerTotal * ov1)) * 100) / 100).toFixed(2), "crimson");
+                    placeText($techRow.find("td:eq(1)"), " (target)", Math.floor(calcTechLevel(managerBase)), "darkgreen");
+                    placeText($techRow.find("td:eq(1)"), " (maximum)", Math.floor(calcTechLevel(managerTotal)), "indigo");
+                    placeText($techRow.find("td:eq(1)"), " (overflow)", Math.floor(calcTechLevel(managerTotal * ov1)), "crimson");
+                    placeText($effiRow.find("td:eq(1)"), " (Expected top manager efficiency)", calcEfficiency(amount, totalEmp, managerTotal, factor1, factor3, qual, tech), "blue");
+
                 }
-
-                var $qualRow = $("tr:contains('Qualification of employees'), tr:contains('Qualification of scientists'), \n\
-							  tr:contains('Workers qualification')");
-                var $levelRow = $("tr:contains('Qualification of player')");
-                var $empRow = $("tr:contains('Number of employees'), tr:contains('Number of scientists'),\n\
-									tr:contains('Number of workers')");
-                var $totalEmpRow = $("tr:contains('profile qualification')");
-                var $techRow = $("tr:contains('Technology level'), tr:contains('Current research')");
-                var $equipRow = $("tr:contains('Equipment quality'), tr:contains('Computers quality'),\n\
-					 tr:contains('Livestock quality'), tr:contains('Quality of agricultural machines')");
-                var $effiRow = $("tr:contains('Top manager efficiency')");
-
-                var amount = numberfy($empRow.find("td:eq(1)").text());
-                var qual = numberfy($qualRow.find("td:eq(1)").text());
-                var level = numberfy($levelRow.find("td:eq(1)").text());
-                var totalEmp = numberfy($totalEmpRow.find("td:eq(1)").text());
-                var tech = numberfy($techRow.find("td:eq(1)").text());
-                var eqQual = numberfy($equipRow.find("td:eq(1)").text());
-
-                ov1 = calcOverflowTop1(totalEmp, factor3, managerTotal);
-                ov3 = calcOverflowTop3(amount, qual, tech, factor1, managerTotal);
-                console.log(ov1, ov3, mapped[here]);
-
-                placeText($empRow.find("td:eq(1)"), " (target)", Math.floor(calcEmployees(qual, factor1, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "darkgreen");
-                placeText($empRow.find("td:eq(1)"), " (maximum)", Math.floor(calcEmployees(qual, factor1, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "indigo");
-                placeText($empRow.find("td:eq(1)"), " (overflow)", Math.floor(calcEmployees(qual, factor1, managerTotal * ov1)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "crimson");
-                placeText($qualRow.find("td:eq(1)"), " (target)", (Math.floor(calcSkill(amount, factor1, managerBase) * 100) / 100).toFixed(2), "darkgreen");
-                placeText($qualRow.find("td:eq(1)"), " (maximum)", (Math.floor(calcSkill(amount, factor1, managerTotal) * 100) / 100).toFixed(2), "indigo");
-                placeText($qualRow.find("td:eq(1)"), " (overflow)", (Math.floor(calcSkill(amount, factor1, managerTotal * ov1) * 100) / 100).toFixed(2), "crimson");
-                placeText($totalEmpRow.find("td:eq(1)"), " (target)", Math.floor(calcAllEmployees(factor3, managerBase)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "darkgreen");
-                placeText($totalEmpRow.find("td:eq(1)"), " (maximum)", Math.floor(calcAllEmployees(factor3, managerTotal)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "indigo");
-                placeText($totalEmpRow.find("td:eq(1)"), " (overflow)", Math.floor(calcAllEmployees(factor3, managerTotal) * ov3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "), "crimson");
-                placeText($equipRow.find("td:eq(1)"), " (target)", (Math.floor(calcEquip(calcSkill(amount, factor1, managerBase)) * 100) / 100).toFixed(2), "darkgreen");
-                placeText($equipRow.find("td:eq(1)"), " (maximum)", (Math.floor(calcEquip(calcSkill(amount, factor1, managerTotal)) * 100) / 100).toFixed(2), "indigo");
-                placeText($equipRow.find("td:eq(1)"), " (overflow)", (Math.floor(calcEquip(calcSkill(amount, factor1, managerTotal * ov1)) * 100) / 100).toFixed(2), "crimson");
-                placeText($techRow.find("td:eq(1)"), " (target)", Math.floor(calcTechLevel(managerBase)), "darkgreen");
-                placeText($techRow.find("td:eq(1)"), " (maximum)", Math.floor(calcTechLevel(managerTotal)), "indigo");
-                placeText($techRow.find("td:eq(1)"), " (overflow)", Math.floor(calcTechLevel(managerTotal * ov1)), "crimson");
-                placeText($effiRow.find("td:eq(1)"), " (Expected top manager efficiency)", calcEfficiency(amount, totalEmp, managerTotal, factor1, factor3, qual, tech), "blue");
-
             }
-        }
+        });
     });
 }
 
